@@ -3,30 +3,51 @@ import sys
 import pandas as pd
 import argparse
 from collections import defaultdict
-from lib import utils
 from tqdm import tqdm
+from lib import dataset
 
 # spaCy import 
 import spacy
+from spacy.language import Language
 from spacy_langdetect import LanguageDetector
-nlp = spacy.load('en_core_web_sm')
-nlp.add_pipe(LanguageDetector(), name='language_detector', last=True)
+"""
+Wrapper necessary, see:
+https://stackoverflow.com/questions/66712753/how-to-use-languagedetector-from-spacy-langdetect-package
+"""
+def get_lang_detector(nlp, name):
+    return LanguageDetector()
 
-"""
-Example call: 
-python build_dataset.py --id test -c Pop Rap -n 100 -s 0.75
-"""
-# args
-parser = argparse.ArgumentParser()
-parser.add_argument('-m', '--max_genres', default=10, type=int, help='Number of different genres of the dataset with most genres.')
-parser.add_argument('-n', '--songs_per_category', default=100, type=int, help='Maximum number of songs per category.')
-parser.add_argument('-s', '--train_split', default=0.75, type=float, help='Size of train split.')
-args = parser.parse_args()
+nlp = spacy.load("en_core_web_sm")
+Language.factory("language_detector", func=get_lang_detector)
+nlp.add_pipe('language_detector', last=True)
 
 # data input
 DATA_LYRICS = './data/lyrics-data.csv'
 DATA_ARTISTS = './data/artists-data.csv'
 DATA_PROCESSED = './data/processed-data.csv'
+OUTPUT_FODLER ='./data'
+
+# data frame columns
+LYRIC = "Lyric"
+ARTIST = "Artist"
+GENRES = "Genres"
+
+# Define the genres in order they join the dataset
+TARGET_GENRES = [
+    "Pop", 
+    "Rock", 
+    "Rap", 
+    "Country", 
+    "Reggae", 
+    "Heavy Metal", 
+    "Blues", 
+    "Indie",
+    "Hip Hop", 
+    "Jazz", 
+    "Folk", 
+    "Gospel/Religioso", 
+]
+
 
 """
 Some dataset processing (remove songs with two genres, only use songs with english language).
@@ -63,193 +84,53 @@ def process_dataset() -> list:
     df.to_csv(DATA_PROCESSED, index=False)  
 
 
-# def build_datasets():
-#     # get genre distribution (we can be sure that one song has only one genre)
-#     genre_distribution = defaultdict(int)
-#     for genre in df['Genres']:
-#         genre_distribution[genre] += 1
-#         # try:
-#         #     genres = genre_list.split("; ")
-#         #     for genre in genres:
-#         #         # exception for "Pop/Rock", as we already have Pop & Rock as categories
-#         #         if genre != "Pop/Rock": genre_distribution[genre] += 1
-#         # except:
-#         #     pass # some weird NaN require this
-    
-#     print(f"# different genres: {len(genre_distribution)}")
-#     genre_distribution = utils.sort_dict(genre_distribution)
-#     utils.print_dict(genre_distribution)
+
+def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
+    songs_per_category = defaultdict(int)
+
+    all_lyrics, all_genres = [], []
+    for index, row in tqdm(df.iterrows(), total=df.shape[0]):
+        lyric = row[LYRIC]
+        genre = row[GENRES]
+        if genre in TARGET_GENRES and songs_per_category[genre] < category_song_limit:
+            songs_per_category[genre] += 1
+            all_lyrics.append(lyric)
+            all_genres.append(genre)
+
+    for i in range(1, len(TARGET_GENRES)):
+        target_genres = TARGET_GENRES[:i+1]
+        print(f"\nBuilding dataset for: {target_genres}")
+
+        lyrics, genres = [], []
+        for lyric, genre in zip(all_lyrics, all_genres):
+            if genre in target_genres:
+                lyrics.append(lyric)
+                genres.append(genre)
+
+        train_val_df = pd.DataFrame({dataset.GENRE: genres, dataset.LYRICS: lyrics})
+
+        # save data
+        path = OUTPUT_FODLER + f"/train_val_{len(target_genres)}_genres.csv"
+        train_val_df.to_csv(path, index=False)  
+        print(f"Saved data to {path}")
 
 
-#     # # build the datasets now
-#     # data_frames = []
-#     # for i in range(2, args.max_genres+1):
-#     #     target_genres = list(genre_distribution.keys())[:i]
-#     #     data_frames.append(build_dataset(target_genres, songs_per_category, train_split))
-#     # return data_frames
 
 
 
-# def build_dataset(artists: pd.DataFrame, lyrics: pd.DataFrame, target_categories: list, songs_per_category: int, train_split: float) -> pd.DataFrame:
-#     print(target_categories)
-
-#     for genre_list in artists['Genres']:
-#         try:
-#             genres = genre_list.split("; ")
-#             for genre in genres:
-#                 # exception for "Pop/Rock", as we already have Pop & Rock as categories
-#                 if genre != "Pop/Rock": genre_distribution[genre] += 1
-#         except:
-#             pass # some weird NaN require this
-    
-
-#     print()
-#     return ""
-
+"""
+Example call: 
+python build_datasets.py -m 3 -n 100 -s 0.75
+"""
+parser = argparse.ArgumentParser()
+parser.add_argument('-n', '--songs_per_category', default=1000, type=int, help='Maximum number of songs per category.')
+args = parser.parse_args()
 
 if __name__ == '__main__':
     if not os.path.exists(DATA_PROCESSED):
         process_dataset()
 
     df = pd.read_csv(DATA_PROCESSED)
-    # build_datasets(df, args.songs_per_category, args.train_split)
+    df = df.sample(frac=1) # shuffle data (only here! --> same samples always in train and val set, for all datasets)
 
-"""
-# songs after removing those due to language: 42756
-(Video2Metadata) PS C:\Users\Johannes\Documents\Studium\Auslandssemester\Song_Classification\song-genre-classification-with-lyrics> python build_datasets.py -n 100 -s 0.75
-# songs: 191378
-# songs after removing those with multiple genres: 42760
-100%|█████████████████████████████████████████████████| 42760/42760 [34:21<00:00, 20.74it/s]
-# songs after removing those due to language: 42245
-"""
-
-"""
-# different genres: 79
-{
-    "Rock": 726,
-    "Pop": 590,
-    "Rom\u00e2ntico": 562,
-    "Gospel/Religioso": 557,
-    "Pop/Rock": 409,
-    "Hip Hop": 325,
-    "Rap": 306,
-    "Sertanejo": 297,
-    "Indie": 291,
-    "MPB": 227,
-    "Dance": 227,
-    "Trilha Sonora": 222,
-    "Heavy Metal": 219,
-    "Electronica": 201,
-    "Ax\u00e9": 191,
-    "Rock Alternativo": 183,
-    "Hard Rock": 178,
-    "Samba": 176,
-    "Funk Carioca": 170,
-    "R&B": 163,
-    "Forr\u00f3": 160,
-    "Funk": 148,
-    "Pagode": 147,
-    "Country": 145,
-    "Black Music": 137,
-    "Reggae": 124,
-    "Folk": 122,
-    "Punk Rock": 112,
-    "Soul Music": 105,
-    "Hardcore": 105,
-    "J-Pop/J-Rock": 98,
-    "Infantil": 91,
-    "Blues": 88,
-    "Cl\u00e1ssico": 76,
-    "Instrumental": 68,
-    "G\u00f3tico": 64,
-    "Tecnopop": 63,
-    "House": 54,
-    "Jazz": 51,
-    "Progressivo": 45,
-    "World Music": 44,
-    "Bossa Nova": 42,
-    "Disco": 41,
-    "Emocore": 41,
-    "Surf Music": 37,
-    "Pop/Punk": 37,
-    "P\u00f3s-Punk": 36,
-    "Samba Enredo": 36,
-    "Regional": 33,
-    "Reggaeton": 33,
-    "Psicodelia": 32,
-    "Rockabilly": 31,
-    "Velha Guarda": 31,
-    "New Wave": 31,
-    "Grunge": 30,
-    "K-Pop/K-Rock": 30,
-    "Jovem Guarda": 30,
-    "Soft Rock": 27,
-    "Trip-Hop": 24,
-    "New Age": 22,
-    "Trap": 21,
-    "COLET\u00c2NEA": 19,
-    "Trance": 18,
-    "Chillout": 17,
-    "Ska": 16,
-    "Classic Rock": 15,
-    "Piano Rock": 11,
-    "Power-Pop": 11,
-    "Industrial": 11,
-    "Metal": 10,
-    "Fado": 7,
-    "Piseiro": 7,
-    "Lo-fi": 7,
-    "Post-Rock": 6,
-    "Kizomba": 6,
-    "Tropical House": 5,
-    "M\u00fasicas Ga\u00fachas": 5,
-    "Electro Swing": 3,
-    "Urban": 1
-}
-"""
-
-"Black Music", ""
-"""
-Genres that occur together:
-{
-    "{'Rap', 'Hip Hop', 'Black Music'}": 5221,
-    "{'Rap', 'Hip Hop'}": 5083,
-    "{'Country'}": 4774,
-    "{'Rock'}": 4672,
-    "{'Heavy Metal'}": 4394,
-    "{'Indie'}": 4289,
-    "{'Rock', 'Indie', 'Rock Alternativo'}": 3223,
-    "{'Rock', 'Heavy Metal', 'Hard Rock'}": 2826,
-    "{'Heavy Metal', 'Hard Rock', 'Rock'}": 2602,
-    "{'Pop'}": 2544,
-    "{'Pop', 'Pop/Rock', 'Dance'}": 2334,
-    "{'Rap'}": 2012,
-    "{'Rock', 'Pop', 'Pop/Rock'}": 1935,
-    "{'Pop', 'Pop/Rock', 'Rom\u00e2ntico'}": 1898,
-    "{'Hard Rock', 'Heavy Metal', 'Rock'}": 1781,
-    "{'Rock', 'Indie'}": 1778,
-    "{'Folk', 'Rock', 'Country'}": 1689,
-    "{'Rock', 'Hard Rock'}": 1614,
-    "{'Soul Music', 'R&B'}": 1570,
-    "{'Rock', 'Pop/Rock'}": 1527,
-    "{'Pop', 'Pop/Rock'}": 1522,
-    "{'Gospel/Religioso'}": 1431,
-    "{'Hip Hop', 'R&B'}": 1376,
-    "{'Pop/Rock'}": 1374,
-    "{'Pop/Rock', 'Rock', 'Gospel/Religioso'}": 1372,
-    "{'Jazz'}": 1356,
-    "{'Pop', 'Dance'}": 1350,
-    "{'Punk Rock'}": 1310,
-    "{'Punk Rock', 'Rock', 'Hardcore'}": 1300,
-    "{'Reggae'}": 1255,
-    "{'Pop', 'Dance', 'Electronica'}": 1251,
-    "{'Pop', 'Pop/Rock', 'Trilha Sonora'}": 1148,
-    "{'Hip Hop'}": 1112,
-    "{'Folk'}": 1078,
-    "{'Blues'}": 1063,
-    "{'Heavy Metal', 'Hard Rock'}": 1056,
-    "{'Soft Rock'}": 1003,
-    "{'Heavy Metal', 'Rock', 'G\u00f3tico'}": 1000,
-    ...
-}
-"""
+    build_and_save_datasets(df, args.songs_per_category)

@@ -1,0 +1,125 @@
+
+
+# """
+# # songs after removing those due to language: 42756
+# (Video2Metadata) PS C:\Users\Johannes\Documents\Studium\Auslandssemester\Song_Classification\song-genre-classification-with-lyrics> python build_datasets.py -n 100 -s 0.75
+# # songs: 191378
+# # songs after removing those with multiple genres: 42760
+# 100%|█████████████████████████████████████████████████| 42760/42760 [34:21<00:00, 20.74it/s]
+# # songs after removing those due to language: 42245
+# """
+
+
+
+# """
+# Genres that occur together:
+# {
+#     "{'Rap', 'Hip Hop', 'Black Music'}": 5221,
+#     "{'Rap', 'Hip Hop'}": 5083,
+#     "{'Country'}": 4774,
+#     "{'Rock'}": 4672,
+#     "{'Heavy Metal'}": 4394,
+#     "{'Indie'}": 4289,
+#     "{'Rock', 'Indie', 'Rock Alternativo'}": 3223,
+#     "{'Rock', 'Heavy Metal', 'Hard Rock'}": 2826,
+#     "{'Heavy Metal', 'Hard Rock', 'Rock'}": 2602,
+#     "{'Pop'}": 2544,
+#     "{'Pop', 'Pop/Rock', 'Dance'}": 2334,
+#     "{'Rap'}": 2012,
+#     "{'Rock', 'Pop', 'Pop/Rock'}": 1935,
+#     "{'Pop', 'Pop/Rock', 'Rom\u00e2ntico'}": 1898,
+#     "{'Hard Rock', 'Heavy Metal', 'Rock'}": 1781,
+#     "{'Rock', 'Indie'}": 1778,
+#     "{'Folk', 'Rock', 'Country'}": 1689,
+#     "{'Rock', 'Hard Rock'}": 1614,
+#     "{'Soul Music', 'R&B'}": 1570,
+#     "{'Rock', 'Pop/Rock'}": 1527,
+#     "{'Pop', 'Pop/Rock'}": 1522,
+#     "{'Gospel/Religioso'}": 1431,
+#     "{'Hip Hop', 'R&B'}": 1376,
+#     "{'Pop/Rock'}": 1374,
+#     "{'Pop/Rock', 'Rock', 'Gospel/Religioso'}": 1372,
+#     "{'Jazz'}": 1356,
+#     "{'Pop', 'Dance'}": 1350,
+#     "{'Punk Rock'}": 1310,
+#     "{'Punk Rock', 'Rock', 'Hardcore'}": 1300,
+#     "{'Reggae'}": 1255,
+#     "{'Pop', 'Dance', 'Electronica'}": 1251,
+#     "{'Pop', 'Pop/Rock', 'Trilha Sonora'}": 1148,
+#     "{'Hip Hop'}": 1112,
+#     "{'Folk'}": 1078,
+#     "{'Blues'}": 1063,
+#     "{'Heavy Metal', 'Hard Rock'}": 1056,
+#     "{'Soft Rock'}": 1003,
+#     "{'Heavy Metal', 'Rock', 'G\u00f3tico'}": 1000,
+#     ...
+# }
+# """
+
+
+
+"""
+AFTER PROCESSING THE DATASET:
+"""
+# {
+#     "Country": 4762,
+#     "Rock": 4617,
+#     "Heavy Metal": 4385,
+#     "Indie": 4244,
+#     "Pop": 2508,
+#     "Rap": 2004,
+#     "Gospel/Religioso": 1423,
+#     "Pop/Rock": 1366,
+#     "Jazz": 1348,
+#     "Punk Rock": 1301,
+#     "Reggae": 1230,
+#     "Hip Hop": 1105,
+#     "Folk": 1066,
+#     "Blues": 1055,
+#     "Soft Rock": 1000,
+#     "Electronica": 848,
+#     "Rom\u00e2ntico": 824,
+#     "Hard Rock": 731,
+#     "Trilha Sonora": 633,
+#     "Rockabilly": 629,
+#     "Tecnopop": 519,
+#     "Hardcore": 435,
+#     "Progressivo": 280,
+#     "Rock Alternativo": 262,
+#     "Piano Rock": 256,
+#     "New Wave": 242,
+#     "Industrial": 238,
+#     "Soul Music": 238,
+#     "Trip-Hop": 235,
+#     "J-Pop/J-Rock": 229,
+#     "R&B": 194,
+#     "P\u00f3s-Punk": 191,
+#     "Dance": 190,
+#     "G\u00f3tico": 184,
+#     "New Age": 179,
+#     "Ska": 178,
+#     "Tropical House": 163,
+#     "Infantil": 153,
+#     "Power-Pop": 120,
+#     "Instrumental": 113,
+#     "MPB": 99,
+#     "Pop/Punk": 89,
+#     "K-Pop/K-Rock": 84,
+#     "Psicodelia": 74,
+#     "Disco": 45,
+#     "Funk": 33,
+#     "Trance": 20,
+#     "Bossa Nova": 18,
+#     "Grunge": 18,
+#     "Fado": 13,
+#     "Reggaeton": 11,
+#     "Sertanejo": 11,
+#     "Samba": 10,
+#     "House": 8,
+#     "World Music": 8,
+#     "Ax\u00e9": 7,
+#     "Cl\u00e1ssico": 6,
+#     "Jovem Guarda": 6,
+#     "Funk Carioca": 4,
+#     "Forr\u00f3": 3
+# }

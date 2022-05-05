@@ -114,6 +114,14 @@ if __name__ == '__main__':
     df = pd.read_csv(DATA_PROCESSED)
     # build_datasets(df, args.songs_per_category, args.train_split)
 
+"""
+# songs after removing those due to language: 42756
+(Video2Metadata) PS C:\Users\Johannes\Documents\Studium\Auslandssemester\Song_Classification\song-genre-classification-with-lyrics> python build_datasets.py -n 100 -s 0.75
+# songs: 191378
+# songs after removing those with multiple genres: 42760
+100%|█████████████████████████████████████████████████| 42760/42760 [34:21<00:00, 20.74it/s]
+# songs after removing those due to language: 42245
+"""
 
 """
 # different genres: 79

@@ -1,7 +1,6 @@
-# Ignore excel files
-*.xlsx
-*.csv
-
+# Ignore some data files
+data/artists-data.csv
+data/lyrics-data.csv
 
 
 # -------------------------------------------------------------

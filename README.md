@@ -13,7 +13,8 @@ conda install -c conda-forge tqdm
 conda install -c conda-forge spacy
 python -m spacy download en_core_web_sm
 
-conda install -c anaconda tensorflow 
+conda install -c anaconda tensorflow
+pip install numpy==1.19.5 # because of soem occuring error
 ```
 
 ## Dataset

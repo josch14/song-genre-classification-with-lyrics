@@ -2,6 +2,7 @@ import pandas as pd
 from collections import defaultdict
 from .utils import lyrics_to_verses, verses_to_lyrics
 import tensorflow as tf
+from tensorflow.data.experimental import AUTOTUNE
 
 # data folder
 DATA_FOLDER ='./data'
@@ -9,8 +10,6 @@ DATA_FOLDER ='./data'
 # data frame columns
 LYRICS = "Lyrics"
 GENRE = "Genre"
-
-from tensorflow.data.experimental import AUTOTUNE
 
 GENRE_2_LABEL = {
     "Pop": 0,
@@ -78,10 +77,10 @@ class Dataset:
         train_dataset = tf.data.Dataset.from_tensor_slices((self.x_train, [GENRE_2_LABEL[y] for y in self.y_train]))
         val_dataset = tf.data.Dataset.from_tensor_slices((self.x_val, [GENRE_2_LABEL[y] for y in self.y_val]))
         
-        train_dataset = train_dataset.batch(batch_size)
-        val_dataset = val_dataset.batch(batch_size)
+        train_dataset = train_dataset.shuffle(1000).batch(batch_size)
+        val_dataset = val_dataset.shuffle(1000).batch(batch_size)
 
-        return train_dataset.prefetch(1), val_dataset.prefetch(AUTOTUNE)
+        return train_dataset.prefetch(AUTOTUNE), val_dataset.prefetch(AUTOTUNE)
 
 
 def process_lyrics(lyrics: str):

@@ -3,6 +3,7 @@ from collections import defaultdict
 from .utils import lyrics_to_verses, verses_to_lyrics
 import tensorflow as tf
 from tensorflow.data.experimental import AUTOTUNE
+import numpy as np
 
 # data folder
 DATA_FOLDER ='./data'
@@ -82,6 +83,8 @@ class Dataset:
 
         return train_dataset.prefetch(AUTOTUNE), val_dataset.prefetch(AUTOTUNE)
 
+    def to_numpy_dataset(self):
+        return np.array(self.x_train), np.array([GENRE_2_LABEL[y] for y in self.y_train]), np.array(self.x_val), np.array([GENRE_2_LABEL[y] for y in self.y_val])
 
 def process_lyrics(lyrics: str):
     # filter out verses

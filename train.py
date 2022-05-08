@@ -38,7 +38,7 @@ if __name__ == '__main__':
         os.makedirs(RESULTS_FOLDER)
 
     # train for different numbers of target genres
-    for n_target_genres in range(2, 12+1):
+    for n_target_genres in range(3, 12+1):
         save_path = os.path.join(RESULTS_FOLDER, f"{model_name}_{n_target_genres}.npy")
 
         if model_name == "lstm":

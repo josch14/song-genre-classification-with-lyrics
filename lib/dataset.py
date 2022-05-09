@@ -4,6 +4,11 @@ from .utils import lyrics_to_verses, verses_to_lyrics
 import tensorflow as tf
 from tensorflow.data.experimental import AUTOTUNE
 import numpy as np
+import math
+import sys
+sys.path.append("..")
+from constants import GENRE_2_LABEL
+import random
 
 # data folder
 DATA_FOLDER ='./data'
@@ -12,80 +17,84 @@ DATA_FOLDER ='./data'
 LYRICS = "Lyrics"
 GENRE = "Genre"
 
-GENRE_2_LABEL = {
-    "Pop": 0,
-    "Rock": 1,
-    "Rap": 2,
-    "Country": 3,
-    "Reggae": 4,
-    "Heavy Metal": 5,
-    "Blues": 6,
-    "Indie": 7,
-    "Hip Hop": 8,
-    "Jazz": 9,
-    "Folk": 10,
-    "Gospel/Religioso": 11}
-
-LABEL_2_GENRE = {
-    0: "Pop",
-    1: "Rock",
-    2: "Rap",
-    3: "Country",
-    4: "Reggae",
-    5: "Heavy Metal",
-    6: "Blues",
-    7: "Indie",
-    8: "Hip Hop",
-    9: "Jazz",
-    10: "Folk",
-    11: "Gospel/Religioso"}
-
 class Dataset:
-    def __init__(self, n_target_genres: int, train_split: float = 0.75):
+    def __init__(self, n_target_genres: int, train_split: float = 0.7):
         self.n_target_genres = n_target_genres
-        self.x_train, self.x_val, self.y_train, self.y_val = [], [], [], []
+        self.x_train, self.y_train, self.x_test, self.y_test = [], [], [], []
         self.__build(train_split)
         self.__processing()
 
 
     def __build(self, train_split: float):
-        path = f"{DATA_FOLDER}/train_val_{self.n_target_genres}_genres.csv"
+        path = f"{DATA_FOLDER}/train_test_{self.n_target_genres}_genres.csv"
         df = pd.read_csv(path)
 
-        # at this point, the data, i.e., the rows in the dataframe, are already shuffled
-        # don't shuffle them again, so that we always have the same samples in train and validation,
-        # for all datasets
-
-        train_samples_per_category = int((len(df)/self.n_target_genres)*train_split)
-        train_songs_per_category = defaultdict(int)
-
+        all_lyrics, all_genres = [], []
         for index, row in df.iterrows():
-            lyrics = row[LYRICS]
-            genre = row[GENRE]
-            if train_songs_per_category[genre] < train_samples_per_category:
-                train_songs_per_category[genre] += 1
-                self.x_train.append(lyrics)
-                self.y_train.append(genre)
-            else:
-                self.x_val.append(lyrics)
-                self.y_val.append(genre)
+            all_lyrics.append(row[LYRICS])
+            all_genres.append(row[GENRE])
+
+        self.x_train, self.y_train, self.x_test, self.y_test = get_splits(all_lyrics, all_genres, train_split)
+
+        # shuffle train set 
+        # (not before, so that any dataset (i.e., with more genres) still has the same songs in train and test set)
+        shuffle_list = list(zip(self.x_train, self.y_train))
+        random.shuffle(shuffle_list)
+        self.x_train, self.y_train = zip(*shuffle_list)
 
     def __processing(self):
         self.x_train = [process_lyrics(x) for x in self.x_train]
-        self.x_val = [process_lyrics(x) for x in self.x_val]
+        self.x_test = [process_lyrics(x) for x in self.x_test]
 
     def to_tf_dataset(self, batch_size: int):
-        train_dataset = tf.data.Dataset.from_tensor_slices((self.x_train, [GENRE_2_LABEL[y] for y in self.y_train]))
-        val_dataset = tf.data.Dataset.from_tensor_slices((self.x_val, [GENRE_2_LABEL[y] for y in self.y_val]))
+        train_set = tf.data.Dataset.from_tensor_slices((self.x_train, [GENRE_2_LABEL[y] for y in self.y_train]))
+        test_set = tf.data.Dataset.from_tensor_slices((self.x_test, [GENRE_2_LABEL[y] for y in self.y_test]))
         
-        train_dataset = train_dataset.shuffle(1000).batch(batch_size)
-        val_dataset = val_dataset.shuffle(1000).batch(batch_size)
+        train_set = train_set.shuffle(1000).batch(batch_size)
+        test_set = test_set.shuffle(1000).batch(batch_size)
 
-        return train_dataset.prefetch(AUTOTUNE), val_dataset.prefetch(AUTOTUNE)
+        return train_set.prefetch(AUTOTUNE), test_set.prefetch(AUTOTUNE)
 
     def to_numpy_dataset(self):
-        return np.array(self.x_train), np.array([GENRE_2_LABEL[y] for y in self.y_train]), np.array(self.x_val), np.array([GENRE_2_LABEL[y] for y in self.y_val])
+        return np.array(self.x_train), np.array([GENRE_2_LABEL[y] for y in self.y_train]), np.array(self.x_test), np.array([GENRE_2_LABEL[y] for y in self.y_test])
 
+
+"""
+Make train and test split evenly balanced, i.e., make sure they got the same genre distribution.
+"""
+def get_splits(all_lyrics: list, all_genres: list, train_split: float):
+
+    # how many songs per genre?
+    songs_per_genre = defaultdict(int)
+    for genre in all_genres:
+        songs_per_genre[genre] += 1
+
+    x_train, y_train, x_test, y_test = [], [], [], []
+    
+    for target_genre, n_songs in songs_per_genre.items():
+        # Look at each genre separately
+        n_songs_train = math.floor(n_songs*train_split)
+
+        n_train, n_test = 0, 0
+        for lyrics, genre in zip(all_lyrics, all_genres):
+            if genre == target_genre:
+                if n_train < n_songs_train:
+                    x_train.append(lyrics)
+                    y_train.append(genre)
+                    n_train += 1
+                else:
+                    x_test.append(lyrics)
+                    y_test.append(genre)
+                    n_test += 1
+
+        # print(f"Category: {target_genre}: {n_train}/{n_test}, total: {n_songs}")
+    
+    return x_train, y_train, x_test, y_test
+
+
+"""
+Some minor lyrics processing.
+"""
 def process_lyrics(lyrics: str):
     # filter out verses
     verses = lyrics_to_verses(lyrics)

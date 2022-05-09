@@ -10,6 +10,8 @@ from lib import dataset
 import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
+
+from constants import DATA_FOLDER, TARGET_GENRES
 """
 Wrapper necessary, see:
 https://stackoverflow.com/questions/66712753/how-to-use-languagedetector-from-spacy-langdetect-package
@@ -22,31 +24,14 @@ Language.factory("language_detector", func=get_lang_detector)
 nlp.add_pipe('language_detector', last=True)
 
 # data input
-DATA_LYRICS = './data/lyrics-data.csv'
-DATA_ARTISTS = './data/artists-data.csv'
-DATA_PROCESSED = './data/processed-data.csv'
-OUTPUT_FODLER ='./data'
+DATA_LYRICS = os.path.join(DATA_FOLDER, "lyrics-data.csv")
+DATA_ARTISTS = os.path.join(DATA_FOLDER, "artists-data.csv")
+DATA_PROCESSED = os.path.join(DATA_FOLDER, "processed-data.csv")
 
 # data frame columns
 LYRIC = "Lyric"
 ARTIST = "Artist"
 GENRES = "Genres"
-
-# Define the genres in order they join the dataset
-TARGET_GENRES = [
-    "Pop", 
-    "Rock", 
-    "Rap", 
-    "Country", 
-    "Reggae", 
-    "Heavy Metal", 
-    "Blues", 
-    "Indie",
-    "Hip Hop", 
-    "Jazz", 
-    "Folk", 
-    "Gospel/Religioso", 
-]
 
 
 """
@@ -85,6 +70,36 @@ def process_dataset() -> list:
 
 
 
+# def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
+#     songs_per_category = defaultdict(int)
+
+#     all_lyrics, all_genres = [], []
+#     for index, row in tqdm(df.iterrows(), total=df.shape[0]):
+#         lyric = row[LYRIC]
+#         genre = row[GENRES]
+#         if genre in TARGET_GENRES and songs_per_category[genre] < category_song_limit:
+#             songs_per_category[genre] += 1
+#             all_lyrics.append(lyric)
+#             all_genres.append(genre)
+
+#     for i in range(1, len(TARGET_GENRES)):
+#         target_genres = TARGET_GENRES[:i+1]
+#         print(f"\nBuilding dataset for: {target_genres}")
+
+#         lyrics, genres = [], []
+#         for lyric, genre in zip(all_lyrics, all_genres):
+#             if genre in target_genres:
+#                 lyrics.append(lyric)
+#                 genres.append(genre)
+
+#         train_val_df = pd.DataFrame({dataset.GENRE: genres, dataset.LYRICS: lyrics})
+
+#         # save data
+#         path = DATA_FOLDER + f"/train_val_{len(target_genres)}_genres.csv"
+#         train_val_df.to_csv(path, index=False)  
+#         print(f"Saved data to {path}")
+
+
 def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
     songs_per_category = defaultdict(int)
 
@@ -107,14 +122,12 @@ def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
                 lyrics.append(lyric)
                 genres.append(genre)
 
-        train_val_df = pd.DataFrame({dataset.GENRE: genres, dataset.LYRICS: lyrics})
+        train_test_df = pd.DataFrame({dataset.GENRE: genres, dataset.LYRICS: lyrics})
 
         # save data
-        path = OUTPUT_FODLER + f"/train_val_{len(target_genres)}_genres.csv"
-        train_val_df.to_csv(path, index=False)  
+        path = os.path.join(DATA_FOLDER, f"train_test_{len(target_genres)}_genres.csv")
+        train_test_df.to_csv(path, index=False)  
         print(f"Saved data to {path}")
-
-
 
 
 
@@ -123,7 +136,7 @@ Example call:
 python build_datasets.py -m 3 -n 100 -s 0.75
 """
 parser = argparse.ArgumentParser()
-parser.add_argument('-n', '--songs_per_category', default=1000, type=int, help='Maximum number of songs per category.')
+parser.add_argument('-n', '--songs_per_category', default=1000000, type=int, help='Maximum number of songs per category.')
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -131,6 +144,6 @@ if __name__ == '__main__':
         process_dataset()
 
     df = pd.read_csv(DATA_PROCESSED)
-    df = df.sample(frac=1) # shuffle data (only here! --> same samples always in train and val set, for all datasets)
+    df = df.sample(frac=1) # shuffle data, so that the songs of same artists don't appear next to each other
 
     build_and_save_datasets(df, args.songs_per_category)

@@ -2,6 +2,10 @@
 data/artists-data.csv
 data/lyrics-data.csv
 
+*.csv
+glove.6B.*
+glove.42B.*
+
 
 # -------------------------------------------------------------
 # Byte-compiled / optimized / DLL files

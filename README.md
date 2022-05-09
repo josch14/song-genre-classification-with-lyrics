@@ -12,11 +12,13 @@ conda install -c conda-forge tqdm
 
 conda install -c conda-forge spacy
 python -m spacy download en_core_web_sm
+pip install spacy-langdetect
 
 conda install -c anaconda tensorflow
-pip install numpy==1.19.5 # because of soem occuring error
 
 conda install -c anaconda scikit-learn 
+
+pip install numpy==1.19.5 # because of some occuring error
 ```
 
 ## Dataset

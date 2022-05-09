@@ -5,8 +5,8 @@ from lib.utils import print_dict, lyrics_to_verses, sort_dict
 def main():
     dataset = Dataset(n_target_genres=12, train_split=0.75)
 
-    x = dataset.x_train + dataset.x_val    
-    y = dataset.y_train + dataset.y_val
+    x = dataset.x_train + dataset.x_test    
+    y = dataset.y_train + dataset.y_test
 
     songs_per_genre = len(x)/12
 

@@ -10,7 +10,7 @@ class LSTM:
         # training paramaters
         self.epochs = epochs
         self.early_stop_epochs = early_stop_epochs
-        self.train_dataset, self.val_dataset = ds.to_tf_dataset(batch_size)
+        self.train_dataset, self.test_dataset = ds.to_tf_dataset(batch_size)
 
         # model itself
         self.model = tf.keras.Sequential([
@@ -42,7 +42,7 @@ class LSTM:
         history = self.model.fit(
             self.train_dataset,
             epochs=self.epochs,
-            validation_data=self.val_dataset,
+            validation_data=self.test_dataset,
             callbacks=[callback])
 
 

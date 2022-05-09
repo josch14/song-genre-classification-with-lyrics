@@ -28,8 +28,8 @@ class Naive_Bayes:
 
     def train(self):
         self.model.fit(self.ds.x_train, self.ds.y_train)
-        predictions = self.model.predict(self.ds.x_val)
+        predictions = self.model.predict(self.ds.x_test)
 
-        val_accuracy = accuracy_score(self.ds.y_val, predictions)
-        print(f"The accuracy is {val_accuracy}")
+        val_accuracy = accuracy_score(self.ds.y_test, predictions)
+        print(f"Accuracy: {val_accuracy}")
         return val_accuracy

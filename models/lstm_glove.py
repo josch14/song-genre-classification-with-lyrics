@@ -38,7 +38,7 @@ class LSTM_Glove:
         self.epochs = epochs
         self.batch_size = batch_size
         self.early_stop_epochs = early_stop_epochs
-        self.x_train, self.y_train, self.x_val, self.y_val = ds.to_numpy_dataset()
+        self.x_train, self.y_train, self.x_test, self.y_test = ds.to_numpy_dataset()
 
         # Tokenizer stuff
         tokenizer = Tokenizer(num_words=vocab_size)
@@ -46,8 +46,8 @@ class LSTM_Glove:
         words_to_index = tokenizer.word_index
         self.x_train_indices = tokenizer.texts_to_sequences(self.x_train)
         self.x_train_indices = pad_sequences(self.x_train_indices, maxlen=max_length, padding='post')
-        self.x_val_indices = tokenizer.texts_to_sequences(self.x_val)
-        self.x_val_indices = pad_sequences(self.x_val_indices, maxlen=max_length, padding='post')
+        self.x_test_indices = tokenizer.texts_to_sequences(self.x_test)
+        self.x_test_indices = pad_sequences(self.x_test_indices, maxlen=max_length, padding='post')
 
         # emebdding matrix & set up the model
         word_to_vec_map = read_glove_vector(os.path.join(DATA_FOLDER, glove_filename))
@@ -78,7 +78,7 @@ class LSTM_Glove:
         history = self.model.fit(
             self.x_train_indices, 
             self.y_train,
-            validation_data=(self.x_val_indices, self.y_val), 
+            validation_data=(self.x_test_indices, self.y_test), 
             batch_size=self.batch_size, 
             epochs=self.epochs,
             callbacks=[callback])

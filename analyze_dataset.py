@@ -1,6 +1,6 @@
 from lib.dataset import Dataset
 from collections import defaultdict
-from lib.utils import print_dict, lyrics_to_verses
+from lib.utils import print_dict, lyrics_to_verses, sort_dict
 
 def main():
     dataset = Dataset(n_target_genres=12, train_split=0.75)
@@ -36,8 +36,8 @@ def main():
         verses = lyrics_to_verses(lyrics)
         for verse in verses:
             verses_dict[verse] += 1
-
-    verses_dict = {k:v for k, v in verses_dict.items() if v > 20}
+    sort_dict(verses_dict)
+    verses_dict = dict(list(verses_dict.items())[:20])
     print_dict(verses_dict, sorted=True)
 
 

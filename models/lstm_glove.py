@@ -5,7 +5,7 @@ https://www.kaggle.com/datasets/rtatman/glove-global-vectors-for-word-representa
 import sys
 sys.path.append("..")
 import os 
-from constants import DATA_FOLDER, GLOVE_FILENAME
+from constants import DATA_FOLDER
 
 from lib.dataset import Dataset
 import tensorflow as tf
@@ -20,8 +20,19 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 class LSTM_Glove:
     def __init__(self, ds: Dataset, batch_size: int, # dataset paramaters
         vocab_size: int, max_length: int, lstm_dim: int, dropout: float, # model paramaters
-        epochs: int, learning_rate: float, early_stop_epochs: int # training paramaters
-        ):
+        epochs: int, learning_rate: float, early_stop_epochs: int, # training paramaters
+        glove_filename: str):
+        
+        if "50d" in glove_filename:
+            glove_dim = 50
+        elif "100d" in glove_filename:
+            glove_dim = 100
+        elif "200d" in glove_filename:
+            glove_dim = 200
+        elif "300d" in glove_filename:
+            glove_dim = 300
+        else:
+            exit("Glove Dimension not valid. Exiting ...")
         
         # training paramaters
         self.epochs = epochs
@@ -39,8 +50,8 @@ class LSTM_Glove:
         self.x_val_indices = pad_sequences(self.x_val_indices, maxlen=max_length, padding='post')
 
         # emebdding matrix & set up the model
-        word_to_vec_map = read_glove_vector(os.path.join(DATA_FOLDER, GLOVE_FILENAME))
-        glove_embedding = get_glove_embedding(max_length, word_to_vec_map, words_to_index)
+        word_to_vec_map = read_glove_vector(os.path.join(DATA_FOLDER, glove_filename))
+        glove_embedding = get_glove_embedding(glove_dim, max_length, word_to_vec_map, words_to_index)
         self.model = get_lstm_glove_model(
             max_length=max_length,
             glove_embedding = glove_embedding,
@@ -79,6 +90,8 @@ def get_lstm_glove_model(max_length, glove_embedding: Embedding, n_target_genres
     embeddings = glove_embedding(x_indices)
     X = Bidirectional(LSTM(lstm_dim))(embeddings)
     X = Dropout(dropout)(X)
+    X = Dense(lstm_dim)(X)
+    X = Dropout(dropout)(X)
     X = Dense(n_target_genres, activation='softmax')(X)
     model = Model(inputs=x_indices, outputs=X)
     return model
@@ -97,16 +110,13 @@ def read_glove_vector(glove_vec):
         return word_to_vec_map
 
 
-def get_glove_embedding(max_length: int, word_to_vec_map: dict, words_to_index: dict):
+def get_glove_embedding(glove_dim: int, max_length: int, word_to_vec_map: dict, words_to_index: dict):
     vocab_len = len(words_to_index)
-    print(vocab_len)
-    embed_vector_len = word_to_vec_map['moon'].shape[0]
 
-    emb_matrix = np.zeros((vocab_len, embed_vector_len))
-
+    emb_matrix = np.zeros((vocab_len, glove_dim))
     for word, index in words_to_index.items():
         embedding_vector = word_to_vec_map.get(word)
         if embedding_vector is not None:
             emb_matrix[index-1, :] = embedding_vector
 
-    return Embedding(input_dim=vocab_len, output_dim=embed_vector_len, input_length=max_length, weights = [emb_matrix], trainable=False)
+    return Embedding(input_dim=vocab_len, output_dim=glove_dim, input_length=max_length, weights = [emb_matrix], trainable=False)

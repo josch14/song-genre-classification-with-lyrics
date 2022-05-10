@@ -11,7 +11,7 @@ import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
-from constants import DATA_FOLDER, TARGET_GENRES
+from constants import DATA_FOLDER, TARGET_GENRES, DATA_ARTISTS, DATA_LYRICS, DATA_PROCESSED
 """
 Wrapper necessary, see:
 https://stackoverflow.com/questions/66712753/how-to-use-languagedetector-from-spacy-langdetect-package
@@ -26,11 +26,6 @@ nlp = spacy.load("en_core_web_sm")
 Language.factory("language_detector", func=get_lang_detector)
 nlp.add_pipe('language_detector', last=True)
 
-# data input
-DATA_LYRICS = os.path.join(DATA_FOLDER, "lyrics-data.csv")
-DATA_ARTISTS = os.path.join(DATA_FOLDER, "artists-data.csv")
-DATA_PROCESSED = os.path.join(DATA_FOLDER, "processed-data.csv")
-
 # data frame columns
 LYRIC = "Lyric"
 ARTIST = "Artist"
@@ -41,8 +36,6 @@ GENRES = "Genres"
 Some dataset processing (remove songs with two genres, only use songs with english language).
 Saves intermediate data to DATA_PROCESSED.
 """
-
-
 def process_dataset() -> list:
     if not os.path.exists(DATA_LYRICS) and os.path.exists(DATA_ARTISTS):
         sys.exit('Could not find data files ..')

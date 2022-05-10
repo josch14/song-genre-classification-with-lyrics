@@ -2,6 +2,14 @@
 import json
 import numpy as np
 import tensorflow
+import pandas as pd
+from constants import DATA_ARTISTS
+
+from nltk.corpus import stopwords
+en_stopwords = stopwords.words('english')
+import contractions
+from constants import SYMBOLS
+
 """
 Sort a dictionary by its values.
 """
@@ -84,3 +92,36 @@ def get_early_stopping_callback(patience_epochs: int):
         restore_best_weights=True,
     )
     return callback
+
+def get_artists():
+    artists = pd.read_csv(DATA_ARTISTS)
+    return [str(a) for a in artists['Artist'].unique()]
+
+
+"""
+Preprocessing.
+"""
+en_stopwords = stopwords.words('english')
+def remove_whitespaces(text: str):
+    return text.strip()
+
+def remove_stopwords(text: str):
+    text = [w for w in text.split(" ") if w not in en_stopwords]
+    return remove_whitespaces(' '.join(text))
+
+def remove_contractions(text: str):
+    text = contractions.fix(text)
+    # exceptions, e.g., "god's", "else's" -> then take the first part of the word
+    text = [w.split("'")[0] if "'" in w else w for w in text.split(" ")]
+    return remove_whitespaces(' '.join(text))
+
+def remove_symbols(text: str):
+    for symbol in SYMBOLS:
+        text = text.replace(symbol, " ")
+    return remove_whitespaces(text)
+
+def remove_artists(text: str, artists: list):
+    for artist in artists:
+        artist = artist.lower()
+        text = text.replace(artist, " ")
+    return remove_whitespaces(text)

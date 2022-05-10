@@ -1,5 +1,10 @@
+import os
 RESULTS_FOLDER = "results"
 DATA_FOLDER = "data"
+# data input
+DATA_LYRICS = os.path.join(DATA_FOLDER, "lyrics-data.csv")
+DATA_ARTISTS = os.path.join(DATA_FOLDER, "artists-data.csv")
+DATA_PROCESSED = os.path.join(DATA_FOLDER, "processed-data.csv")
 
 # Define the genres in order they join the dataset
 TARGET_GENRES = [
@@ -57,3 +62,9 @@ MODELS = ["lstm", "lstm_glove", "naive_bayes_bernoulli",
 
 NAIVE_BAYES_BERNOULLI_NB = "bernoulli"
 NAIVE_BAYES_MULTINOMIAL_NB = "multinomial"
+COUNT_VECTORIZER = "count"
+TFIDF_VECTORIZER = "tfidf"
+
+SYMBOLS = ["\n", "!", "”", "\"", "#", "$", "%", "&", "(", ")", \
+    "*", "+", ",", "-", ".", "/", ":", ";", "<", "=", ">", "?", \
+    "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~", "’"]

@@ -22,6 +22,9 @@ pip install more-itertools
 conda install -c conda-forge tensorflow-hub 
 
 pip install numpy==1.19.5 # because of some occuring error
+conda install -c anaconda nltk 
+
+pip install contractions
 ```
 
 ```

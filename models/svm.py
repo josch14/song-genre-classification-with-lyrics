@@ -3,7 +3,6 @@ from lib.dataset import Dataset
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
-from sklearn.metrics import accuracy_score
 """
 https://towardsdatascience.com/text-classification-using-naive-bayes-theory-a-working-example-2ef4b7eb7d5a
 """

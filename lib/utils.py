@@ -1,8 +1,7 @@
 
 import json
 import numpy as np
-from tensorflow.keras.layers import LSTM, Dropout, Dense, Input, Bidirectional, Embedding
-
+import tensorflow
 """
 Sort a dictionary by its values.
 """
@@ -58,4 +57,30 @@ def get_glove_embedding(glove_dim: int, max_length: int, word_to_vec_map: dict, 
         if embedding_vector is not None:
             emb_matrix[index-1, :] = embedding_vector
 
-    return Embedding(input_dim=vocab_len, output_dim=glove_dim, input_length=max_length, weights=[emb_matrix], trainable=True)
+    return tensorflow.keras.layers.Embedding(input_dim=vocab_len, output_dim=glove_dim, input_length=max_length, weights=[emb_matrix], trainable=True)
+
+
+
+def get_glove_dim(glove_filename: str):
+    if "50d" in glove_filename:
+        glove_dim = 50
+    elif "100d" in glove_filename:
+        glove_dim = 100
+    elif "200d" in glove_filename:
+        glove_dim = 200
+    elif "300d" in glove_filename:
+        glove_dim = 300
+    else:
+        exit("Glove Dimension not valid. Exiting ...")
+    return glove_dim
+
+
+def get_early_stopping_callback(patience_epochs: int):
+    callback = tensorflow.keras.callbacks.EarlyStopping(
+        monitor='val_accuracy',
+        patience=patience_epochs,
+        mode='auto',
+        verbose=1,
+        restore_best_weights=True,
+    )
+    return callback

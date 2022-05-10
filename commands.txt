@@ -1,0 +1,12 @@
+python .\train.py -m mlp_glove -lr 1e-2 > results_mlp_glove_1e-2.txt
+python .\train.py -m mlp_glove -lr 1e-3 > results_mlp_glove_1e-3.txt
+python .\train.py -m lstm_glove -lr 1e-3 > results_lstm_glove_1e-3.txt
+python .\train.py -m lstm_glove -lr 1e-4 > results_lstm_glove_1e-4.txt
+
+
+
+
+python .\train.py -m lstm_glove -lr 1e-2 > results_lstm_glove_1e-2.txt
+python .\train.py -m lstm -lr 1e-2 > results_lstm_1e-2.txt
+
+

@@ -8,6 +8,7 @@ import more_itertools
 from tqdm import tqdm
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from lib.utils import get_early_stopping_callback
 
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
@@ -19,35 +20,26 @@ class LSTM:
                  ):
 
         # training paramaters
-        self.epochs = epochs
-        self.early_stop_epochs = early_stop_epochs
-        self.ds = ds
+        self.x_train, self.y_train, self.x_test, self.y_test = ds.to_numpy_dataset()
         self.train_dataset, self.test_dataset = ds.to_tf_dataset(batch_size)
-
-        # compute class weights since the genres of song occur not equally often
-        self.class_weights = get_class_weights(ds)
-
-        # training paramaters
         self.epochs = epochs
         self.batch_size = batch_size
         self.early_stop_epochs = early_stop_epochs
-        self.x_train, self.y_train, self.x_test, self.y_test = ds.to_numpy_dataset()
+        self.ds = ds
+        self.class_weights = get_class_weights(ds)
 
         # Tokenizer stuff
         tokenizer = Tokenizer(num_words=vocab_size, oov_token='<OOV>')
         tokenizer.fit_on_texts(self.x_train)
-
         self.x_train_indices = tokenizer.texts_to_sequences(self.x_train)
-        self.x_train_indices = pad_sequences(
-            self.x_train_indices, maxlen=max_length, padding='post')
+        self.x_train_indices = pad_sequences(self.x_train_indices, maxlen=max_length, padding='post')
         self.x_test_indices = tokenizer.texts_to_sequences(self.x_test)
-        self.x_test_indices = pad_sequences(
-            self.x_test_indices, maxlen=max_length, padding='post')
+        self.x_test_indices = pad_sequences(self.x_test_indices, maxlen=max_length, padding='post')
+
 
         # model itself
         self.model = tf.keras.Sequential([
-            tf.keras.layers.Embedding(
-                input_dim=vocab_size, output_dim=lstm_dim),
+            tf.keras.layers.Embedding(input_dim=vocab_size, output_dim=lstm_dim),
             tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm_dim)),
             tf.keras.layers.Dropout(dropout),
             tf.keras.layers.Dense(lstm_dim, activation='relu'),
@@ -55,29 +47,18 @@ class LSTM:
             tf.keras.layers.Dense(ds.n_target_genres, activation='softmax')
         ])
         self.model.compile(
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(
-                from_logits=False),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
             optimizer=tf.keras.optimizers.Adam(learning_rate),
             metrics=['accuracy'])
 
     def train(self):
-
-        # use early stopping
-        callback = tf.keras.callbacks.EarlyStopping(
-            monitor='val_accuracy',
-            patience=self.early_stop_epochs,
-            mode='auto',
-            verbose=1,
-            restore_best_weights=True,  # maybe use later on
-        )
-
         history = self.model.fit(
             self.x_train_indices,
             self.y_train,
             validation_data=(self.x_test_indices, self.y_test),
             batch_size=self.batch_size,
             epochs=self.epochs,
-            callbacks=[callback],
+            callbacks=[get_early_stopping_callback(self.early_stop_epochs)],
             class_weight=self.class_weights,
             verbose=2)
 

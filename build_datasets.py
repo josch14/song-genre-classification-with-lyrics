@@ -75,36 +75,6 @@ def process_dataset() -> list:
     df.to_csv(DATA_PROCESSED, index=False)
 
 
-# def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
-#     songs_per_category = defaultdict(int)
-
-#     all_lyrics, all_genres = [], []
-#     for index, row in tqdm(df.iterrows(), total=df.shape[0]):
-#         lyric = row[LYRIC]
-#         genre = row[GENRES]
-#         if genre in TARGET_GENRES and songs_per_category[genre] < category_song_limit:
-#             songs_per_category[genre] += 1
-#             all_lyrics.append(lyric)
-#             all_genres.append(genre)
-
-#     for i in range(1, len(TARGET_GENRES)):
-#         target_genres = TARGET_GENRES[:i+1]
-#         print(f"\nBuilding dataset for: {target_genres}")
-
-#         lyrics, genres = [], []
-#         for lyric, genre in zip(all_lyrics, all_genres):
-#             if genre in target_genres:
-#                 lyrics.append(lyric)
-#                 genres.append(genre)
-
-#         train_val_df = pd.DataFrame({dataset.GENRE: genres, dataset.LYRICS: lyrics})
-
-#         # save data
-#         path = DATA_FOLDER + f"/train_val_{len(target_genres)}_genres.csv"
-#         train_val_df.to_csv(path, index=False)
-#         print(f"Saved data to {path}")
-
-
 def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
     songs_per_category = defaultdict(int)
 

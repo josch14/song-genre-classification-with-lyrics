@@ -2,20 +2,20 @@
 Glove embedding from Kaggle:
 https://www.kaggle.com/datasets/rtatman/glove-global-vectors-for-word-representation/code
 """
-from tensorflow.keras.layers import LSTM, Dropout, Dense, Input, Bidirectional, Embedding
+import sys
+sys.path.append("..")
 import os
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dropout, Dense, Embedding, GlobalAveragePooling1D
 import tensorflow as tf
 from lib.dataset import Dataset
 from lib.utils import read_glove_vector, get_glove_embedding
 from constants import DATA_FOLDER
-import sys
-sys.path.append("..")
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
-
-class LSTM_Glove:
+class MLP_Glove:
     def __init__(self, ds: Dataset, batch_size: int,  # dataset paramaters
                  vocab_size: int, max_length: int, lstm_dim: int, dropout: float,  # model paramaters
                  epochs: int, learning_rate: float, early_stop_epochs: int,  # training paramaters
@@ -37,6 +37,9 @@ class LSTM_Glove:
         self.batch_size = batch_size
         self.early_stop_epochs = early_stop_epochs
         self.x_train, self.y_train, self.x_test, self.y_test = ds.to_numpy_dataset()
+
+        # compute class weights since the genres of song occur not equally often
+        self.class_weights = get_class_weights(ds)
 
         # Tokenizer stuff
         tokenizer = Tokenizer(num_words=vocab_size, oov_token='<OOV>')
@@ -83,18 +86,34 @@ class LSTM_Glove:
             validation_data=(self.x_test_indices, self.y_test),
             batch_size=self.batch_size,
             epochs=self.epochs,
-            callbacks=[callback])
+            callbacks=[callback],
+            class_weight=self.class_weights)
 
         return history
 
 
 def get_lstm_glove_model(max_length, glove_embedding: Embedding, n_target_genres: int, lstm_dim: int, dropout: float):
-    x_indices = Input(shape=(max_length, ))
-    embeddings = glove_embedding(x_indices)
-    X = Bidirectional(LSTM(lstm_dim))(embeddings)
-    X = Dropout(dropout)(X)
-    X = Dense(lstm_dim)(X)
-    X = Dropout(dropout)(X)
-    X = Dense(n_target_genres, activation='softmax')(X)
-    model = Model(inputs=x_indices, outputs=X)
+    model = tf.keras.Sequential()
+    model.add(glove_embedding)
+    model.add(GlobalAveragePooling1D())
+    model.add(Dense(lstm_dim))
+    model.add(Dropout(dropout))
+    model.add(Dense(lstm_dim))
+    model.add(Dropout(dropout))
+    model.add(Dense(n_target_genres, activation='softmax'))
+    print(model.summary())
     return model
+
+def get_class_weights(ds: Dataset):
+    _, train_genres, _, _ = ds.to_numpy_dataset()
+
+    computed_class_weights = compute_class_weight(
+        class_weight='balanced',
+        classes=np.asarray(list(range(0, ds.n_target_genres))),
+        y=train_genres)
+
+    class_weights = {}
+    for i in range(0, ds.n_target_genres):
+        class_weights[i] = computed_class_weights[i]
+
+    return class_weights

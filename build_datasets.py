@@ -6,7 +6,7 @@ from collections import defaultdict
 from tqdm import tqdm
 from lib import dataset
 
-# spaCy import 
+# spaCy import
 import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
@@ -16,8 +16,11 @@ from constants import DATA_FOLDER, TARGET_GENRES
 Wrapper necessary, see:
 https://stackoverflow.com/questions/66712753/how-to-use-languagedetector-from-spacy-langdetect-package
 """
+
+
 def get_lang_detector(nlp, name):
     return LanguageDetector()
+
 
 nlp = spacy.load("en_core_web_sm")
 Language.factory("language_detector", func=get_lang_detector)
@@ -38,19 +41,22 @@ GENRES = "Genres"
 Some dataset processing (remove songs with two genres, only use songs with english language).
 Saves intermediate data to DATA_PROCESSED.
 """
+
+
 def process_dataset() -> list:
     if not os.path.exists(DATA_LYRICS) and os.path.exists(DATA_ARTISTS):
         sys.exit('Could not find data files ..')
 
     lyrics = pd.read_csv(DATA_LYRICS)
-    lyrics = lyrics[lyrics['language']=='en']
+    lyrics = lyrics[lyrics['language'] == 'en']
     artists = pd.read_csv(DATA_ARTISTS)
 
     # merge DataFrames, results has columns:
     # song = [Lyric, Artist, Genres]
-    df = lyrics.merge(artists[['Artist', 'Genres', 'Link']], left_on='ALink', right_on='Link', how='inner')
-    df = df.drop(columns=['SName','ALink','SLink','language','Link'])
-    df.dropna(subset = ["Lyric", "Artist", "Genres"], inplace=True)
+    df = lyrics.merge(artists[['Artist', 'Genres', 'Link']],
+                      left_on='ALink', right_on='Link', how='inner')
+    df = df.drop(columns=['SName', 'ALink', 'SLink', 'language', 'Link'])
+    df.dropna(subset=["Lyric", "Artist", "Genres"], inplace=True)
 
     # remove songs that have two genres
     print(f"# songs: {len(df)}")
@@ -59,15 +65,14 @@ def process_dataset() -> list:
 
     # remove songs that do not contain english language
     for index, row in tqdm(df.iterrows(), total=df.shape[0]):
-        doc = nlp(row['Lyric']) # use spaCy NLP
+        doc = nlp(row['Lyric'])  # use spaCy NLP
         detect_language = doc._.language
         if detect_language['language'] != 'en' or detect_language['score'] < 0.99:
             df.drop(index, inplace=True)
     print(f"# songs after removing those due to language: {len(df)}")
 
     # save processed dataset
-    df.to_csv(DATA_PROCESSED, index=False)  
-
+    df.to_csv(DATA_PROCESSED, index=False)
 
 
 # def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
@@ -96,7 +101,7 @@ def process_dataset() -> list:
 
 #         # save data
 #         path = DATA_FOLDER + f"/train_val_{len(target_genres)}_genres.csv"
-#         train_val_df.to_csv(path, index=False)  
+#         train_val_df.to_csv(path, index=False)
 #         print(f"Saved data to {path}")
 
 
@@ -122,13 +127,14 @@ def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
                 lyrics.append(lyric)
                 genres.append(genre)
 
-        train_test_df = pd.DataFrame({dataset.GENRE: genres, dataset.LYRICS: lyrics})
+        train_test_df = pd.DataFrame(
+            {dataset.GENRE: genres, dataset.LYRICS: lyrics})
 
         # save data
-        path = os.path.join(DATA_FOLDER, f"train_test_{len(target_genres)}_genres.csv")
-        train_test_df.to_csv(path, index=False)  
+        path = os.path.join(
+            DATA_FOLDER, f"train_test_{len(target_genres)}_genres.csv")
+        train_test_df.to_csv(path, index=False)
         print(f"Saved data to {path}")
-
 
 
 """
@@ -136,7 +142,8 @@ Example call:
 python build_datasets.py -m 3 -n 100 -s 0.75
 """
 parser = argparse.ArgumentParser()
-parser.add_argument('-n', '--songs_per_category', default=1000000, type=int, help='Maximum number of songs per category.')
+parser.add_argument('-n', '--songs_per_category', default=1000000,
+                    type=int, help='Maximum number of songs per category.')
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -144,6 +151,7 @@ if __name__ == '__main__':
         process_dataset()
 
     df = pd.read_csv(DATA_PROCESSED)
-    df = df.sample(frac=1) # shuffle data, so that the songs of same artists don't appear next to each other
+    # shuffle data, so that the songs of same artists don't appear next to each other
+    df = df.sample(frac=1)
 
     build_and_save_datasets(df, args.songs_per_category)

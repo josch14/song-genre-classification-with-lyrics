@@ -3,18 +3,18 @@ DATA_FOLDER = "data"
 
 # Define the genres in order they join the dataset
 TARGET_GENRES = [
-    "Pop", 
-    "Rock", 
-    "Rap", 
-    "Country", 
-    "Reggae", 
-    "Heavy Metal", 
-    "Blues", 
+    "Pop",
+    "Rock",
+    "Rap",
+    "Country",
+    "Reggae",
+    "Heavy Metal",
+    "Blues",
     "Indie",
-    "Hip Hop", 
-    "Jazz", 
-    "Folk", 
-    "Gospel/Religioso", 
+    "Hip Hop",
+    "Jazz",
+    "Folk",
+    "Gospel/Religioso",
 ]
 
 GENRE_2_LABEL = {
@@ -44,7 +44,7 @@ LABEL_2_GENRE = {
     9: "Jazz",
     10: "Folk",
     11: "Gospel/Religioso"}
-    
+
 
 GLOVE_FILENAME_42B_300D = "glove.42B.300d.txt"
 GLOVE_FILENAME_6B_50D = "glove.6B.50d.txt"
@@ -52,7 +52,8 @@ GLOVE_FILENAME_6B_100D = "glove.6B.100d.txt"
 GLOVE_FILENAME_6B_200D = "glove.6B.200d.txt"
 GLOVE_FILENAME_6B_300D = "glove.6B.300d.txt"
 
-MODELS = ["lstm", "lstm_glove", "naive_bayes_bernoulli", "naive_bayes_multinomial", "svm"]
+MODELS = ["lstm", "lstm_glove", "naive_bayes_bernoulli",
+          "naive_bayes_multinomial", "svm", "mlp_glove", "naive_bayes_glove"]
 
 NAIVE_BAYES_BERNOULLI_NB = "bernoulli"
 NAIVE_BAYES_MULTINOMIAL_NB = "multinomial"

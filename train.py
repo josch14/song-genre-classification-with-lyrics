@@ -54,7 +54,7 @@ def train_mlp_glove(dataset: Dataset, learning_rate: float):
         max_length=256,
         dropout=0.2,
         learning_rate=learning_rate,
-        epochs=100,
+        epochs=1000,
         early_stop_epochs=10,
         glove_filename=GLOVE_FILENAME_6B_50D)
     test_set_predictions, history = model.train()
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         os.makedirs(RESULTS_FOLDER)
 
     # train for different numbers of target genres
-    for n_target_genres in range(3, 12+1):
+    for n_target_genres in range(2, 12+1):
         if not model_name in MODELS:
             print(f"\nModel {model_name} is not implemented ..")
             exit()

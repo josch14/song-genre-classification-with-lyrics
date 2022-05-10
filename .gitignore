@@ -2,7 +2,8 @@
 data/artists-data.csv
 data/lyrics-data.csv
 
-*.csv
+artists-data.csv
+lyrics-data.csv
 glove.6B.*
 glove.42B.*
 

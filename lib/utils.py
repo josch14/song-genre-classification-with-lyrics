@@ -1,14 +1,14 @@
-
 import json
 import numpy as np
 import tensorflow
 import pandas as pd
-from constants import DATA_ARTISTS
+from constants import DATA_PROCESSED
 
 from nltk.corpus import stopwords
 en_stopwords = stopwords.words('english')
 import contractions
 from constants import SYMBOLS
+from sklearn.utils.class_weight import compute_class_weight
 
 """
 Sort a dictionary by its values.
@@ -93,35 +93,87 @@ def get_early_stopping_callback(patience_epochs: int):
     )
     return callback
 
+def get_class_weights(categories: list):
+    n_categories = len(set(categories))
+
+    computed_class_weights = compute_class_weight(
+        class_weight='balanced',
+        classes=np.asarray(list(range(0, n_categories))),
+        y=categories)
+
+    class_weights = {}
+    for i in range(0, n_categories):
+        class_weights[i] = computed_class_weights[i]
+
+    return class_weights
+
+
 def get_artists():
-    artists = pd.read_csv(DATA_ARTISTS)
+    artists = pd.read_csv(DATA_PROCESSED)
     return [str(a) for a in artists['Artist'].unique()]
 
 
-"""
-Preprocessing.
-"""
+
+# Text Preprocessing.
 en_stopwords = stopwords.words('english')
+
+"""
+Pipeline for multiple preprocessing steps.
+"""
+def preprocessing(string_list: list, pipeline: list, verbose: bool=False):
+    for method in pipeline:
+        if verbose: print(f"Preprocessing: {method} ..")
+        if method == "remove_artists":
+            artists = get_artists()
+            string_list = [remove_artists(s, artists) for s in string_list]
+
+        elif method == "lower_case":
+            string_list = [s.lower() for s in string_list]
+
+        elif method == "remove_symbols":
+            string_list = [remove_symbols(s) for s in string_list]
+
+        elif method == "remove_contractions":
+            string_list = [remove_contractions(s) for s in string_list]
+
+        elif method == "remove_stopwords":
+            string_list = [remove_stopwords(s) for s in string_list]
+
+        elif method == "remove_whitespaces":
+            string_list = [remove_whitespaces(s) for s in string_list]
+
+        else:
+            exit(f"Error: Preprocessing method {method} unkown..")
+    return string_list
+
+
+"""
+Preprocessing methods.
+"""
 def remove_whitespaces(text: str):
     return text.strip()
 
 def remove_stopwords(text: str):
+    text = remove_whitespaces(text)
     text = [w for w in text.split(" ") if w not in en_stopwords]
-    return remove_whitespaces(' '.join(text))
+    return ' '.join(text)
 
 def remove_contractions(text: str):
+    text = remove_whitespaces(text)
     text = contractions.fix(text)
-    # exceptions, e.g., "god's", "else's" -> then take the first part of the word
-    text = [w.split("'")[0] if "'" in w else w for w in text.split(" ")]
+    # exceptions, e.g., "god's", "else's" -> then take the longest substring fo the word
+    text = [max(w.split("'"), key=len) if "'" in w else w for w in text.split(" ")]
     return remove_whitespaces(' '.join(text))
 
 def remove_symbols(text: str):
     for symbol in SYMBOLS:
         text = text.replace(symbol, " ")
     return remove_whitespaces(text)
-
+    
 def remove_artists(text: str, artists: list):
+    text = remove_whitespaces(text)
     for artist in artists:
-        artist = artist.lower()
+        artist = remove_whitespaces(artist)
         text = text.replace(artist, " ")
     return remove_whitespaces(text)
+

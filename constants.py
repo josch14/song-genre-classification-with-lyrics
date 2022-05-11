@@ -1,5 +1,5 @@
 import os
-EVALUATION_FOLDER = "results"
+RESULTS_FOLDER = "results"
 EVALUATION_FOLDER = "evaluation"
 DATA_FOLDER = "data"
 # data input

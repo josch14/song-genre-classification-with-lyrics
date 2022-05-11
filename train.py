@@ -3,16 +3,10 @@ import argparse
 import os
 from sklearn.metrics import classification_report
 
-from models.lstm import LSTM
-from models.lstm_glove import LSTM_Glove
-from models.naive_bayes import Naive_Bayes
-from models.svm import SVM
-from models.mlp_glove import MLP_Glove
-from lib.dataset import Dataset
-from lib.utils import round_float
-from constants import LABEL_2_GENRE, MODELS, RESULTS_FOLDER, GLOVE_FILENAME_42B_300D, \
-    GLOVE_FILENAME_6B_50D, GLOVE_FILENAME_6B_100D, GLOVE_FILENAME_6B_200D, GLOVE_FILENAME_6B_300D, \
-        NAIVE_BAYES_BERNOULLI_NB, NAIVE_BAYES_MULTINOMIAL_NB
+from models import *
+from lib.dataset import *
+from lib.utils import *
+from constants import *
 
 # train LSTM
 def train_lstm(dataset: Dataset, learning_rate: float):

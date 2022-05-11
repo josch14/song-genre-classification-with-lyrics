@@ -3,20 +3,15 @@ import argparse
 import os
 from sklearn.metrics import classification_report, confusion_matrix
 import pandas as pd
-import matplotlib as plt
 import seaborn as sn
 
-from models.lstm import LSTM
-from models.lstm_glove import LSTM_Glove
-from models.naive_bayes import Naive_Bayes
-from models.svm import SVM
-from models.mlp_glove import MLP_Glove
-from lib.dataset import Dataset
-from lib.utils import round_float
-from constants import LABEL_2_GENRE, TARGET_GENRES, MODELS, EVALUATION_FOLDER, GLOVE_FILENAME_42B_300D, \
-    GLOVE_FILENAME_6B_50D, GLOVE_FILENAME_6B_100D, GLOVE_FILENAME_6B_200D, GLOVE_FILENAME_6B_300D, \
-        NAIVE_BAYES_BERNOULLI_NB, NAIVE_BAYES_MULTINOMIAL_NB
+from models import *
+from lib.dataset import *
+from lib.utils import *
+from constants import *
 
+import matplotlib.pyplot as plt
+from matplotlib import figure
 # train LSTM
 def train_lstm(dataset: Dataset, learning_rate: float):
     model = LSTM(
@@ -77,7 +72,7 @@ if __name__ == '__main__':
     if not os.path.exists(EVALUATION_FOLDER):
         os.makedirs(EVALUATION_FOLDER)
 
-    n_target_genres = 3 # use all genres
+    n_target_genres = 12 # use all genres
     dataset = Dataset(n_target_genres)
     test_set_predictions = None
 
@@ -122,21 +117,27 @@ if __name__ == '__main__':
             + f"R: {round_float(stats['recall']*100)}   "
             + f"F1: {round_float(stats['f1-score']*100)}")
 
-
-
-    # label_names_1=["Film [1]", "Cars [2]", "Music [10]", "Pets [15]", "Sport [17]", "Travel [19]", "Gaming [20]", "People [22]", "Comedy [23]", "Entertainment [24]", "News & Politics [25]", "How-to & Style [26]", "Education [27]", "Science & Technology [28]", "Non-profits & Activism [29]"]
-    # label_names_2=["[1]", "[2]", "[10]", "[15]", "[17]", "[19]", "[20]", "[22]", "[23]", "[24]", "[25]", "[26]", "[27]", "[28]", "[29]"]
     cm = confusion_matrix(dataset.y_test, test_set_predictions)
     cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2) 
-    df_cm = pd.DataFrame(cm, index = [i for i in TARGET_GENRES], columns = [i for i in TARGET_GENRES])
+    df_cm = pd.DataFrame(cm, index = [i for i in TARGET_GENRES[:n_target_genres]], columns = [i for i in TARGET_GENRES[:n_target_genres]])
 
-    plt.figure(figsize = (18.3,15)) 
-    sn.set(font_scale=1.1) # Adjust to fit
-    svm = sn.heatmap(df_cm, annot=True,cmap="OrRd")
+    figure.Figure(figsize = (19.3, 15))
+    sn.set(font_scale=0.55) # Adjust to fit
+    svm = sn.heatmap(df_cm, annot=True,cmap="Blues")
     plt.xlabel("\nPredicted Category", fontweight='bold')
     plt.ylabel("Target Category", fontweight='bold')
-    plt.show()
-
     figure = svm.get_figure()
-    save_path = os.path.join(EVALUATION_FOLDER, f"{model_name}.png")
-    figure.savefig(save_path, dpi=300, bbox_inches = 'tight', pad_inches=0.0)
+
+
+    # save classification report and confusion matrix to local files
+    text_file = open(
+        os.path.join(EVALUATION_FOLDER, 
+        f"{model_name}.txt"), 
+        "w")
+    text_file.write(report)
+    text_file.close()
+
+    figure.savefig(
+        os.path.join(EVALUATION_FOLDER, f"{model_name}.png"), 
+        dpi=300, bbox_inches = 'tight', 
+        pad_inches=0.0)

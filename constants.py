@@ -58,8 +58,7 @@ GLOVE_FILENAME_6B_100D = "glove.6B.100d.txt"
 GLOVE_FILENAME_6B_200D = "glove.6B.200d.txt"
 GLOVE_FILENAME_6B_300D = "glove.6B.300d.txt"
 
-MODELS = ["lstm", "lstm_glove", "naive_bayes_bernoulli",
-          "naive_bayes_multinomial", "svm", "mlp_glove", "naive_bayes_glove"]
+MODELS = ["lstm", "lstm_glove", "naive_bayes_bernoulli", "naive_bayes_multinomial", "svm", "mlp_glove"]
 
 NAIVE_BAYES_BERNOULLI_NB = "bernoulli"
 NAIVE_BAYES_MULTINOMIAL_NB = "multinomial"
@@ -69,3 +68,20 @@ TFIDF_VECTORIZER = "tfidf"
 SYMBOLS = ["\n", "\r", "!", "”", "\"", "#", "$", "%", "&", "(", ")", \
     "*", "+", ",", "-", ".", "/", ":", ";", "<", "=", ">", "?", \
     "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~", "’"]
+
+
+MACRO_PRECISION = "macro-precision"
+MACRO_RECALL = "macro-recall"
+MACRO_F1 = "macro-f1"
+WEIGHTED_PRECISION = "weighted-precision"
+WEIGHTED_RECALL = "weighted-recall"
+WEIGHTED_F1 = "weighted-f1"
+
+MEASURES = [
+    MACRO_PRECISION,
+    MACRO_RECALL,
+    MACRO_F1,
+    WEIGHTED_PRECISION,
+    WEIGHTED_RECALL,
+    WEIGHTED_F1
+]

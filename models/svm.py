@@ -27,7 +27,8 @@ class SVM:
             TfidfVectorizer(),
             SVC(
                 gamma='auto', 
-                kernel='linear' # worse performing options: rbf, sigmoid
+                kernel='linear', # worse performing options: rbf, sigmoid
+                C=2
             )
         )
 

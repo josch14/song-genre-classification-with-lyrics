@@ -3,16 +3,10 @@ import argparse
 import os
 from sklearn.metrics import classification_report
 
-from models.lstm import LSTM
-from models.lstm_glove import LSTM_Glove
-from models.naive_bayes import Naive_Bayes
-from models.svm import SVM
-from models.mlp_glove import MLP_Glove
-from lib.dataset import Dataset
-from lib.utils import round_float
-from constants import LABEL_2_GENRE, MODELS, RESULTS_FOLDER, GLOVE_FILENAME_42B_300D, \
-    GLOVE_FILENAME_6B_50D, GLOVE_FILENAME_6B_100D, GLOVE_FILENAME_6B_200D, GLOVE_FILENAME_6B_300D, \
-        NAIVE_BAYES_BERNOULLI_NB, NAIVE_BAYES_MULTINOMIAL_NB
+from models import *
+from lib.dataset import *
+from lib.utils import *
+from constants import *
 
 # train LSTM
 def train_lstm(dataset: Dataset, learning_rate: float):
@@ -71,7 +65,7 @@ if __name__ == '__main__':
         os.makedirs(RESULTS_FOLDER)
 
     # train for different numbers of target genres
-    for n_target_genres in range(2, 12+1):
+    for n_target_genres in range(6, 12+1):
         if not model_name in MODELS:
             exit(f"\nError: Model {model_name} is not implemented ..")
         print(f"\nMethod: {model_name}, # genres: {n_target_genres}")
@@ -107,7 +101,7 @@ if __name__ == '__main__':
 
             else: 
                 continue
-            np.save(save_path, history.history)
+            # np.save(save_path, history.history)
 
         test_set_predictions = [LABEL_2_GENRE[p] for p in test_set_predictions]
         report = classification_report(dataset.y_test, test_set_predictions, digits=4, output_dict=True)

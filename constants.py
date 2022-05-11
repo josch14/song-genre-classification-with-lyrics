@@ -1,5 +1,6 @@
 import os
-RESULTS_FOLDER = "results"
+EVALUATION_FOLDER = "results"
+EVALUATION_FOLDER = "evaluation"
 DATA_FOLDER = "data"
 # data input
 DATA_LYRICS = os.path.join(DATA_FOLDER, "lyrics-data.csv")

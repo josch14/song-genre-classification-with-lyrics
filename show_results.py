@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from constants import MODELS, RESULTS_FOLDER
+from constants import MODELS, EVALUATION_FOLDER
 
 if __name__ == '__main__':
 
@@ -10,7 +10,7 @@ if __name__ == '__main__':
         for n_target_genres in range(2, 12+1):
             try:
                 # load results
-                save_path = os.path.join(RESULTS_FOLDER, f"{model_name}_{n_target_genres}.npy")
+                save_path = os.path.join(EVALUATION_FOLDER, f"{model_name}_{n_target_genres}.npy")
                 history=np.load(save_path, allow_pickle=True).item()
 
                 # get statistics

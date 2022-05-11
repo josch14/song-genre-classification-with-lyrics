@@ -1,30 +1,26 @@
-# todo
-python .\train.py -m lstm_glove -lr 1e-4 > results/results_lstm_glove_1e-4.txt
-python .\train.py -m lstm -lr 1e-2 > results/results_lstm_1e-2.txt
-
-python .\train.py -m lstm_glove -lr 1e-3 > results/results_lstm_glove_1e-3.txt # fertig machen (Laptop)
-python .\train.py -m lstm_glove -lr 1e-2 > results/results_lstm_glove_1e-2.txt # vielleicht
-python .\train.py -m mlp_glove -lr 1e-3 > results/results_mlp_glove_1e-4.txt
-
-FERTIG
-python .\train.py -m lstm -lr 1e-3 > results/results_lstm_1e-3.txt
-python .\train.py -m lstm -lr 1e-4 > results/results_lstm_1e-4.txt
-
+# TRAINING AND EVALUATION RESULTS:
 python .\train.py -m naive_bayes_bernoulli > results/results_naive_bayes_bernoulli.txt
 python .\train.py -m naive_bayes_multinomial > results/results_naive_bayes_multinomial.txt
 python .\train.py -m svm > results/results_svm.txt
 
+python .\train.py -m lstm_glove -lr 1e-3 > results/results_lstm_glove_1e-3.txt
+python .\train.py -m lstm_glove -lr 1e-4 > results/results_lstm_glove_1e-4.txt
+
+python .\train.py -m lstm -lr 1e-3 > results/results_lstm_1e-3.txt
+python .\train.py -m lstm -lr 1e-4 > results/results_lstm_1e-4.txt
+
 python .\train.py -m mlp_glove -lr 1e-2 > results/results_mlp_glove_1e-2.txt
 python .\train.py -m mlp_glove -lr 1e-3 > results/results_mlp_glove_1e-3.txt
 
+# SAVE METRICS PLOTS AND LATEX TABLE LINES
+python show_results.py
 
-
-# for testing
-python .\train.py -m mlp_glove -lr 1e-2
-python .\train.py -m lstm_glove -lr 1e-2
-python .\train.py -m lstm -lr 1e-2
-python .\train.py -m naive_bayes_bernoulli
-python .\train.py -m naive_bayes_multinomial
-python .\train.py -m svm
+# 12 GENRES: DETAILED EVALUATION AND CONFUSION MATRIX
+python evaluate_model.py -m naive_bayes_bernoulli
+python evaluate_model.py -m naive_bayes_multinomial
+python evaluate_model.py -m svm 
+python evaluate_model.py -m mlp_glove -lr 1e-3
+python evaluate_model.py -m lstm_glove -lr 1e-3
+python evaluate_model.py -m lstm -lr 1e-3
 
 

@@ -64,8 +64,8 @@ MODEL_2_NAME = {
     "naive_bayes_multinomial": "Naive Bayes (Multinomial)",
     "svm": "SVM",
     "mlp_glove": "Averaged GloVe + Output Layer",
-    "lstm": "GloVe + LSTM",
-    "lstm_glove": "LSTM"}
+    "lstm": "LSTM",
+    "lstm_glove": "LSTM + GloVe"}
 
 NAIVE_BAYES_BERNOULLI_NB = "bernoulli"
 NAIVE_BAYES_MULTINOMIAL_NB = "multinomial"

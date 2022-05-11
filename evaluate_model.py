@@ -121,9 +121,10 @@ if __name__ == '__main__':
     cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2) 
     df_cm = pd.DataFrame(cm, index = [i for i in TARGET_GENRES[:n_target_genres]], columns = [i for i in TARGET_GENRES[:n_target_genres]])
 
-    figure.Figure(figsize = (19.3, 15))
+    figure.Figure(figsize = (19.2, 15))
     sn.set(font_scale=0.55) # Adjust to fit
     svm = sn.heatmap(df_cm, annot=True,cmap="Blues")
+    plt.title(MODEL_2_NAME[model_name], fontweight='bold')
     plt.xlabel("\nPredicted Category", fontweight='bold')
     plt.ylabel("Target Category", fontweight='bold')
     figure = svm.get_figure()

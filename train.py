@@ -65,7 +65,7 @@ if __name__ == '__main__':
         os.makedirs(RESULTS_FOLDER)
 
     # train for different numbers of target genres
-    for n_target_genres in range(2, 12+1):
+    for n_target_genres in range(6, 12+1):
         if not model_name in MODELS:
             exit(f"\nError: Model {model_name} is not implemented ..")
         print(f"\nMethod: {model_name}, # genres: {n_target_genres}")
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
             else: 
                 continue
-            np.save(save_path, history.history)
+            # np.save(save_path, history.history)
 
         test_set_predictions = [LABEL_2_GENRE[p] for p in test_set_predictions]
         report = classification_report(dataset.y_test, test_set_predictions, digits=4, output_dict=True)

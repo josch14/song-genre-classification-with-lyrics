@@ -1,11 +1,11 @@
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.pipeline import make_pipeline
 
 # local imports
 from lib.dataset import Dataset
 from lib.utils import preprocessing
-from constants import NAIVE_BAYES_BERNOULLI_NB, NAIVE_BAYES_MULTINOMIAL_NB
+from constants import NAIVE_BAYES_BERNOULLI_NB, NAIVE_BAYES_MULTINOMIAL_NB, TFIDF_VECTORIZER
 
 class Naive_Bayes:
     def __init__(self, 
@@ -13,10 +13,10 @@ class Naive_Bayes:
             classifier_str: str):
         if classifier_str == NAIVE_BAYES_BERNOULLI_NB:
             # classifier
-            classifier = BernoulliNB()
-            
+            classifier = BernoulliNB(alpha=0.05, binarize=0.0) # default binarize value
+
             # vectorizer
-            vectorizer = TfidfVectorizer()
+            vectorizer = CountVectorizer()
 
             # preprocessing pipeline 
             preprocessing_pipeline = [
@@ -29,7 +29,7 @@ class Naive_Bayes:
 
         elif classifier_str == NAIVE_BAYES_MULTINOMIAL_NB:
             # classifier
-            classifier = MultinomialNB()
+            classifier = MultinomialNB(alpha=0.05)
             
             # vectorizer
             vectorizer = CountVectorizer()

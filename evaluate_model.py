@@ -76,7 +76,6 @@ if __name__ == '__main__':
     dataset = Dataset(n_target_genres)
     test_set_predictions = None
 
-
     # evaluate desired method
     if model_name == "naive_bayes_bernoulli":
         test_set_predictions = naive_bayes(dataset, NAIVE_BAYES_BERNOULLI_NB)
@@ -117,9 +116,12 @@ if __name__ == '__main__':
             + f"R: {round_float(stats['recall']*100)}   "
             + f"F1: {round_float(stats['f1-score']*100)}")
 
-    cm = confusion_matrix(dataset.y_test, test_set_predictions)
+    cm = confusion_matrix([GENRE_2_LABEL[g] for g in dataset.y_test], [GENRE_2_LABEL[g] for g in test_set_predictions])
     cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2) 
-    df_cm = pd.DataFrame(cm, index = [i for i in TARGET_GENRES[:n_target_genres]], columns = [i for i in TARGET_GENRES[:n_target_genres]])
+
+    modified_target_genres = TARGET_GENRES
+    modified_target_genres[-1] = "Gospel/\nReligioso"
+    df_cm = pd.DataFrame(cm, index = modified_target_genres, columns = modified_target_genres)
 
     figure.Figure(figsize = (19.2, 15))
     sn.set(font_scale=0.55) # Adjust to fit
@@ -128,7 +130,6 @@ if __name__ == '__main__':
     plt.xlabel("\nPredicted Category", fontweight='bold')
     plt.ylabel("Target Category", fontweight='bold')
     figure = svm.get_figure()
-
 
     # save classification report and confusion matrix to local files
     text_file = open(

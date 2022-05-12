@@ -81,12 +81,12 @@
             "weighted-f1": 46.94
         },
         "12": {
-            "macro-precision": 45.3,
-            "macro-recall": 45.71,
-            "macro-f1": 45.07,
-            "weighted-precision": 47.24,
-            "weighted-recall": 47.3,
-            "weighted-f1": 46.96
+            "macro-precision": 45.62,
+            "macro-recall": 46.29,
+            "macro-f1": 45.85,
+            "weighted-precision": 47.92,
+            "weighted-recall": 48.00,
+            "weighted-f1": 47.86
         }
     },
     "lstm_glove": {
@@ -171,12 +171,12 @@
             "weighted-f1": 48.47
         },
         "12": {
-            "macro-precision": 45.59,
-            "macro-recall": 47.28,
-            "macro-f1": 46.23,
-            "weighted-precision": 47.94,
-            "weighted-recall": 48.06,
-            "weighted-f1": 47.82
+            "macro-precision": 47.19,
+            "macro-recall": 46.11,
+            "macro-f1": 46.55,
+            "weighted-precision": 48.31,
+            "weighted-recall": 48.44,
+            "weighted-f1": 48.30
         }
     },
     "naive_bayes_bernoulli": {
@@ -531,12 +531,12 @@
             "weighted-f1": 54.69
         },
         "12": {
-            "macro-precision": 53.04,
-            "macro-recall": 55.74,
-            "macro-f1": 53.99,
-            "weighted-precision": 55.65,
-            "weighted-recall": 55.58,
-            "weighted-f1": 55.31
+            "macro-precision": 52.95,
+            "macro-recall": 56.55,
+            "macro-f1": 54.16,
+            "weighted-precision": 56.24,
+            "weighted-recall": 55.49,
+            "weighted-f1": 55.32
         }
     }
 }

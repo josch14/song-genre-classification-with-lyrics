@@ -2,19 +2,17 @@ import json
 import numpy as np
 import tensorflow
 import pandas as pd
-from constants import DATA_PROCESSED
-
+import contractions
+from sklearn.utils.class_weight import compute_class_weight
 from nltk.corpus import stopwords
 en_stopwords = stopwords.words('english')
-import contractions
-from constants import SYMBOLS
-from sklearn.utils.class_weight import compute_class_weight
+
+from constants import DATA_PROCESSED, SYMBOLS
+
 
 """
 Sort a dictionary by its values.
 """
-
-
 def sort_dict(d: dict) -> dict:
     return dict(sorted(d.items(), key=lambda item: item[1], reverse=True))
 
@@ -22,14 +20,15 @@ def sort_dict(d: dict) -> dict:
 """
 Pretty print a dictionary.
 """
-
-
 def print_dict(d: dict, sorted=False) -> None:
     if sorted:
         d = sort_dict(d)
     print(json.dumps(d, indent=4))
 
 
+"""
+Further useful functions.
+"""
 def lyrics_to_verses(lyrics: str) -> list:
     return lyrics.split("\n")
 
@@ -41,11 +40,11 @@ def verses_to_lyrics(verses: list) -> str:
 def round_float(number: float, digits: int = 2):
     return round(number, digits)
 
-# """
-# Use Glove.
-# https://towardsdatascience.com/sentiment-analysis-using-lstm-and-glove-embeddings-99223a87fe8e
-# """
 
+"""
+Get GloVe word vectors. Much help from:
+https://towardsdatascience.com/sentiment-analysis-using-lstm-and-glove-embeddings-99223a87fe8e
+"""
 def read_glove_vector(glove_vec):
     with open(glove_vec, 'r', encoding='UTF-8') as f:
         word_to_vec_map = {}
@@ -54,7 +53,6 @@ def read_glove_vector(glove_vec):
             curr_word = w_line[0]
             word_to_vec_map[curr_word] = np.array(w_line[1:], dtype=np.float64)
         return word_to_vec_map
-
 
 def get_glove_embedding(glove_dim: int, max_length: int, word_to_vec_map: dict, words_to_index: dict):
     vocab_len = len(words_to_index)
@@ -66,8 +64,6 @@ def get_glove_embedding(glove_dim: int, max_length: int, word_to_vec_map: dict, 
             emb_matrix[index-1, :] = embedding_vector
 
     return tensorflow.keras.layers.Embedding(input_dim=vocab_len, output_dim=glove_dim, input_length=max_length, weights=[emb_matrix], trainable=True)
-
-
 
 def get_glove_dim(glove_filename: str):
     if "50d" in glove_filename:
@@ -83,6 +79,11 @@ def get_glove_dim(glove_filename: str):
     return glove_dim
 
 
+
+
+"""
+Early stopping is used for all machine learning methods.
+"""
 def get_early_stopping_callback(patience_epochs: int):
     callback = tensorflow.keras.callbacks.EarlyStopping(
         monitor='val_accuracy',
@@ -93,6 +94,9 @@ def get_early_stopping_callback(patience_epochs: int):
     )
     return callback
 
+"""
+Class weights are used for all machine learning methods.
+"""
 def get_class_weights(categories: list):
     n_categories = len(set(categories))
 
@@ -108,18 +112,10 @@ def get_class_weights(categories: list):
     return class_weights
 
 
-def get_artists():
-    artists = pd.read_csv(DATA_PROCESSED)
-    return [str(a) for a in artists['Artist'].unique()]
-
-
-
-# Text Preprocessing.
+"""
+Preprocessing Pipeline.
+"""
 en_stopwords = stopwords.words('english')
-
-"""
-Pipeline for multiple preprocessing steps.
-"""
 def preprocessing(string_list: list, pipeline: list, verbose: bool=False):
     for method in pipeline:
         if verbose: print(f"Preprocessing: {method} ..")
@@ -143,13 +139,17 @@ def preprocessing(string_list: list, pipeline: list, verbose: bool=False):
             string_list = [remove_whitespaces(s) for s in string_list]
 
         else:
-            exit(f"Error: Preprocessing method {method} unkown..")
+            exit(f"Error: Preprocessing method {method} unknown..")
     return string_list
 
 
 """
 Preprocessing methods.
 """
+def get_artists():
+    artists = pd.read_csv(DATA_PROCESSED)
+    return [str(a) for a in artists['Artist'].unique()]
+
 def remove_whitespaces(text: str):
     return text.strip()
 

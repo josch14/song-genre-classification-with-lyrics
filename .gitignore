@@ -1,12 +1,10 @@
 # Ignore some data files
 data/artists-data.csv
 data/lyrics-data.csv
-
 artists-data.csv
 lyrics-data.csv
 glove.6B.*
 glove.42B.*
-
 
 # -------------------------------------------------------------
 # Byte-compiled / optimized / DLL files

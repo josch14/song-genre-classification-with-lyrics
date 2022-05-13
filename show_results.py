@@ -10,7 +10,6 @@ from lib.utils import *
 
 results_overview_path = os.path.join(EVALUATION_FOLDER, f"results_overview.json")
 
-
 """
 Methods for producing plots and statistics.
 """
@@ -76,7 +75,6 @@ def produce_latex_table_lines(n_genres: int, results_overview: dict):
         print(model_line)
 
 
-
 """
 Helping Methods.
 """
@@ -109,14 +107,13 @@ if __name__ == '__main__':
     results_overview = read_dict()
 
     """
-    LATEX TABLES.
+    Generate LaTeX tables.
     """
     for n_genres in range(2, 12+1):
         produce_latex_table_lines(n_genres=n_genres, results_overview=results_overview)
 
-
     """
-    PLOTS.
+    Generate Plots.
     """
     min_genre=2
     max_genre=12

@@ -12,16 +12,14 @@ from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
 from constants import DATA_FOLDER, TARGET_GENRES, DATA_ARTISTS, DATA_LYRICS, DATA_PROCESSED
+
 """
-Wrapper necessary, see:
+Language detection model to ensure that all lyrics are english. 
+The following wrapper is necessary, see:
 https://stackoverflow.com/questions/66712753/how-to-use-languagedetector-from-spacy-langdetect-package
 """
-
-
 def get_lang_detector(nlp, name):
     return LanguageDetector()
-
-
 nlp = spacy.load("en_core_web_sm")
 Language.factory("language_detector", func=get_lang_detector)
 nlp.add_pipe('language_detector', last=True)
@@ -30,7 +28,6 @@ nlp.add_pipe('language_detector', last=True)
 LYRIC = "Lyric"
 ARTIST = "Artist"
 GENRES = "Genres"
-
 
 """
 Some dataset processing (remove songs with two genres, only use songs with english language).
@@ -100,10 +97,7 @@ def build_and_save_datasets(df: pd.DataFrame, category_song_limit: int) -> None:
         print(f"Saved data to {path}")
 
 
-"""
-Example call: 
-python build_datasets.py -m 3 -n 100 -s 0.75
-"""
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', '--songs_per_category', default=1000000,
                     type=int, help='Maximum number of songs per category.')

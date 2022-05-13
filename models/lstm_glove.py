@@ -1,7 +1,3 @@
-"""
-Glove embedding from Kaggle:
-https://www.kaggle.com/datasets/rtatman/glove-global-vectors-for-word-representation/code
-"""
 import os
 from tqdm import tqdm
 import more_itertools
@@ -14,7 +10,6 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from lib.dataset import Dataset
 from lib.utils import read_glove_vector, get_glove_embedding, get_glove_dim, get_early_stopping_callback, get_class_weights, preprocessing
 from constants import DATA_FOLDER
-
 
 class LSTM_Glove:
     def __init__(self, 

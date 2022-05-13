@@ -1,16 +1,14 @@
-# import sys
-# sys.path.append("..")
-
-
 import random
-from constants import GENRE_2_LABEL
 import pandas as pd
 from collections import defaultdict
-from .utils import lyrics_to_verses, verses_to_lyrics
 import tensorflow as tf
 from tensorflow.data.experimental import AUTOTUNE
 import numpy as np
 import math
+
+# local imports
+from constants import GENRE_2_LABEL
+from .utils import lyrics_to_verses, verses_to_lyrics
 
 # data folder
 DATA_FOLDER = './data'

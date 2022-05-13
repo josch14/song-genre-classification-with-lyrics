@@ -2,7 +2,6 @@ from lib.dataset import Dataset
 from collections import defaultdict
 from lib.utils import print_dict, lyrics_to_verses, sort_dict
 from constants import TARGET_GENRES
-import matplotlib.pyplot as plt
 
 def main():
     dataset = Dataset(n_target_genres=12)

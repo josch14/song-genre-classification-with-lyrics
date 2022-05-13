@@ -1,7 +1,3 @@
-"""
-Glove embedding from Kaggle:
-https://www.kaggle.com/datasets/rtatman/glove-global-vectors-for-word-representation/code
-"""
 import os
 from tqdm import tqdm
 import more_itertools

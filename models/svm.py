@@ -28,7 +28,7 @@ class SVM:
             SVC(
                 gamma='auto', 
                 kernel='linear', # worse performing options: rbf, sigmoid
-                C=2
+                C=1
             )
         )
 

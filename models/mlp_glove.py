@@ -66,7 +66,7 @@ class MLP_Glove:
             tf.keras.layers.Dropout(dropout),
             tf.keras.layers.Dense(ds.n_target_genres, activation='softmax')
         ])
-
+        self.model.summary()
         # model compile
         self.model.compile(
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),

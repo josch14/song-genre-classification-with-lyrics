@@ -36,7 +36,7 @@ def plot_metric(
             genre_dict = model_dict[str(n_target_genres)]
             values.append(genre_dict[metric])
 
-        plt.plot(genre_list, values, label=MODEL_2_NAME[model], marker=".")
+        plt.plot(genre_list, values, label=MODEL_2_NAME[model], marker=".", markersize=11, linewidth=2)
     
     # x-axis
     plt.xlabel("# Genres")

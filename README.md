@@ -1,6 +1,8 @@
 # Lyrics-Based Song Genre Classification
 Lyrics-Based Song Genre Classification. Project as part of the lecture TDT4310: Intelligent Text Analytics and Language Understanding at NTNU, 2022.
 
+Have a look at the full report [here](0_Report.pdf).
+
 ## Abstract
 Musical genres are essential for organizing songs into musical collections and providing well-functioning music recommendation and retrieval. In order to support these methods, songs need to be tagged with their appropriate genre(s). Annotation of genres by humans is time-consuming and costly, while reliable automatic song genre classification is difficult, especially because the boundaries between musical genres are not clearly defined. Thus, song genre classification remains a challenging topic. To this end, we target this task by only using song lyrics. For this, we implement both, traditional and machine learning text classification methods. Furthermore, we investigate how the classification performance of all methods depends on the number of considered genres in the dataset. Our experiments show that the classification performance of text classification methods degrades for increasing number of considered genres. The best results were consistently achieved using the Bernoulli Naive Bayes classifier.
 
